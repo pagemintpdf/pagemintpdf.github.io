@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+	<link rel="icon" type="image/png" sizes="32x32" href="favicon3.png?v=2" />
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon3.png?v=2" />
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon3.png?v=2" />
+  
+	<link rel="manifest" href="/manifest.json" />
+<link rel="icon" href="/favicon3.png" type="image/png" sizes="32x32">
+<meta name="theme-color" content="#0f172a" />
+
+<meta name="author" content="CPM MALLU">
+<meta name="description" content="PageMintPDF – A secure, ad-free text-to-PDF converter focused on privacy. Convert your text into clean PDFs instantly with no sign-up or tracking.">
+<meta name="keywords" content="PageMintPDF, text to PDF converter, CPM MALLU , CPMMALLU , CPM MALLU tools , CPMMALLU tools , secure PDF tool, free PDF generator, no login PDF converter, fast text PDF maker, ad-free PDF tool, private PDF generator, convert text to PDF, styled PDF output, lightweight PDF tool, privacy-first PDF converter">
+<meta name="robots" content="index, follow">
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PageMintPDF</title>
+  
+  
+	
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {},
+      },
+    };
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="fonts/Noto_Color_Emoji-normal.js"></script>
+</head>
+
+<body class="bg-gray-900 min-h-screen p-4 flex items-center justify-center text-white">
+  <div class="bg-gray-800 shadow-xl rounded-2xl p-6 w-full max-w-xl space-y-4"><br>
+  	
+  	<h1 class="text-4xl font-bold mb-6 text-teal-500 text-center underline decoration-white decoration-[1px] underline-offset-2">
+  PageMintPDF
+</h1><br>
+    <h1 class="text-xl font-bold text-center text-white">Text to PDF Generator</h1>
+
+    
+    <div>
+      <label class="block text-sm font-medium text-gray-300 mb-1">Upload TXT File</label>
+      <input type="file" id="fileInput" accept=".txt" class="w-full border border-gray-600 bg-gray-700 text-white p-2 rounded"/>
+      <p id="fileName" class="text-sm text-green-400 mt-1 hidden"></p>
+    </div>
+
+    
+    <div id="dropZone" class="border-2 border-dashed border-gray-500 p-4 rounded text-center text-gray-300 hover:border-blue-400 transition cursor-pointer">
+      <p>Drag & Drop your .txt file here</p>
+      <p class="text-sm text-gray-500">(or tap to select)</p>
+    </div>
+
+    
+    <div>
+      <label class="block text-sm font-medium text-gray-300 mb-1">Or Type Your Text</label>
+      <textarea id="textInput" rows="8" placeholder="Enter your text here..." class="w-full border border-gray-600 bg-gray-700 text-white p-2 rounded resize-none"></textarea>
+    </div>
+
+    
+    <div class="max-w-md mx-auto mt-4">
+  <button onclick="convertToPDF()" class="w-full bg-teal-600 text-white py-2 rounded hover:bg-teal-700 font-semibold cursor-pointer">
+    Generate PDF
+  </button>
+</div>
+  
+<div class="max-w-md mx-auto mt-4">
+<button onclick="location.reload()" class="w-full bg-slate-600 hover:bg-zinc-700 text-white py-2 rounded font-semibold cursor-pointer">
+      Upload or enter new text
+    </button>
+    </div>
+    
+    <div class="max-w-md mx-auto mt-4">
+  <button id="installAppBtn" style="display:none;" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded font-semibold cursor-pointer">
+    Install App
+  </button>
+</div>
+    
+  
+  <div class="max-w-md mx-auto mt-4">
+  <a href="https://cpmmallu-ux.github.io" target="_blank" class="block w-full text-center bg-zinc-600 text-white py-2 rounded font-semibold cursor-pointer">
+    Visit the Creator’s Projects
+  </a>
+</div>
+  
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const dropZone = document.getElementById('dropZone');
+    const textInput = document.getElementById('textInput');
+    const fileNameDisplay = document.getElementById('fileName');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+
+   
+    fileInput.addEventListener('change', handleFile);
+    dropZone.addEventListener('dragover', e => {
+      e.preventDefault();
+      dropZone.classList.add('border-blue-400');
+    });
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('border-blue-400');
+    });
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropZone.classList.remove('border-blue-400');
+      if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        handleFile({ target: { files: e.dataTransfer.files } });
+      }
+    });
+
+    function handleFile(e) {
+      const file = e.target.files[0];
+      if (file && file.type === "text/plain") {
+        fileNameDisplay.textContent = `Uploaded: ${file.name}`;
+        fileNameDisplay.classList.remove("hidden");
+        const reader = new FileReader();
+        reader.onload = () => {
+          textInput.value = reader.result;
+        };
+        reader.readAsText(file);
+      } else {
+        alert("Please upload a valid .txt file");
+      }
+    }
+
+    async function convertToPDF() {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
+
+  const text = textInput.value.trim();
+  if (!text) return alert("Please enter or upload some text");
+
+  
+  pdf.setFont("Noto_Color_Emoji", "normal");
+  pdf.setFontSize(12);
+
+  const lines = pdf.splitTextToSize(text, 180); 
+  let y = 10;
+
+  for (let i = 0; i < lines.length; i++) {
+    if (y > 270) {
+      pdf.addPage();
+      y = 10;
+    }
+    pdf.text(lines[i], 10, y);
+    y += 10;
+  }
+
+  pdf.save("text_output.pdf");
+}
+  </script>
+  
+  <script>
+  window.onload = function () {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+</script>
+  
+  <footer style="text-align:center; font-size:14px; padding: 15px 10px; opacity: 0.7;">
+  © 2025 SafeImgConverter • Open Source under <a href="https://opensource.org/licenses/MIT" target="_blank" style="color:inherit; text-decoration:underline;">MIT License</a> • Hosted on <a href="https://github.com" target="_blank" style="color:inherit; text-decoration:underline;">GitHub Pages</a>
+</footer>
+
+<script>
+	
+  let deferredPrompt;
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+
+   
+    const installBtn = document.getElementById("installAppBtn");
+    installBtn.style.display = "block";
+
+    installBtn.addEventListener('click', () => {
+      installBtn.style.display = "none"; 
+      deferredPrompt.prompt(); 
+
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('App installed');
+        } else {
+          console.log('App dismissed');
+        }
+        deferredPrompt = null;
+      });
+    });
+  });
+</script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+  }
+</script>
+
+</body>
+</html>
