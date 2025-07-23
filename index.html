@@ -30,7 +30,6 @@
     };
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="fonts/Noto_Color_Emoji-normal.js"></script>
 </head>
 
 <body class="bg-gray-900 min-h-screen p-4 flex items-center justify-center text-white">
@@ -133,10 +132,6 @@
 
   const text = textInput.value.trim();
   if (!text) return alert("Please enter or upload some text");
-
-  
-  pdf.setFont("Noto_Color_Emoji", "normal");
-  pdf.setFontSize(12);
 
   const lines = pdf.splitTextToSize(text, 180); 
   let y = 10;
